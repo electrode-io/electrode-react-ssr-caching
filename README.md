@@ -1,11 +1,11 @@
-# ssr-react-profiler
+# electrode-react-ssr-profiler
 
 Helps profiling time each React composite component takes in SSR
 
 # Installing
 
 ```
-$npm i @walmart/ssr-react-profiler
+$npm i @walmart/electrode-react-ssr-profiler
 ```
 
 # Usage
@@ -15,7 +15,7 @@ This module should be loaded as early as possible in order to install the hook t
 You just need to require it:
 
 ```js
-require("@walmart/ssr-react-profiler");
+var ssrReactProfiler = require("@walmart/electrode-react-ssr-profiler");
 ```
 
 Then when you call `ReactDOM.renderToString`, do:
@@ -23,6 +23,6 @@ Then when you call `ReactDOM.renderToString`, do:
 ```
 ssrReactProfiler.clearProfileData();
 var html = ReactDOM.renderToString();
-console.log(JSON.stringify(ssrReactProfiler, null, 2));
+console.log(JSON.stringify(ssrReactProfiler.profileData, null, 2));
 ```
 

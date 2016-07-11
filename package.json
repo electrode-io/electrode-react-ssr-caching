@@ -1,5 +1,5 @@
 {
-  "name": "ssr-react-profiler",
+  "name": "electrode-react-ssr-profiler",
   "version": "1.0.0",
   "description": "Helps profiling time each React composite component takes in SSR",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@gecgithub01.walmart.com:electrode/ssr-react-profiler.git"
+    "url": "git@gecgithub01.walmart.com:electrode/electrode-react-ssr-profiler.git"
   },
   "keywords": [],
   "author": "Joel Chen <xchen@walmartlabs.com>",
