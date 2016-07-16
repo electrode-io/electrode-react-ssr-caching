@@ -10,6 +10,7 @@ const config = {
   caching: false,
   debug: false,
   hashKey: true,
+  stripUrlProtocol: true,
   MAX_CACHE_SIZE: 50 * 1024 * 1024 // 50Meg
 };
 
@@ -26,129 +27,213 @@ if (config.hashKey) {
 
 const profileData = {};
 
+/* non string keys that can be templatized */
+const whiteListNonStringKeys = [
+  // "price",
+  // "savingsPrice",
+  // "wasPrice",
+  // "listPrice",
+  // "unitPrice",
+  // "averageRating",
+  // "numberOfReviews"
+];
+
+/* keys that should not be templatized */
+const preserveKeys = [
+  "lifeCycleStatus",
+  "availabilityStatus",
+  "isAValidOffer",
+  "variantType",
+  "variantTypes",
+  "variants"
+];
+
+const omit = _.omitBy ? _.omitBy : _.omit;
+const propsToOmit = ["moduleData",
+  "moduleType",
+  "moduleVersion",
+  "moduleTypeComponentMap",
+  "zoneName",
+  "children"];
+
+function genHeaderKey(props) {
+  const filteredProps = omit(props, function (value, key) {
+    return (propsToOmit.indexOf(key) > -1 || _.isFunction(value));
+  });
+  if (props.moduleData) {
+    filteredProps.publishedDate = props.moduleData.publishedDate;
+  }
+  return JSON.stringify(filteredProps);
+}
+
 const blackListed = {};
 const whiteListed = {
   // product collection
   "ProductQuantity": {
     enable: false,  // quantity has to be dynamic
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "ProductInformation": {
     enable: false, // can't cache due to dynamic price
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "ProductCard": {
     enable: false,  // contains ProductInformation
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "ProductOffer": {
     enable: false,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "ProductImage": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "Layout": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "HeroImagery": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "About": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "ProductCallToAction": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "JSMediaSelector": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "RadonSelectOption": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "Chooser.Option": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "RadonSelect": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "PriceHero": {
     enable: false,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys
   },
   "Link": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   "Image": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys
   },
   "ProductPrimaryCTA": {
     enable: true,
-    strategy: "template"
+    strategy: "template",
+    preserveKeys,
+    whiteListNonStringKeys
   },
   // Header
   "GlobalLefthandNavMobile": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalSecondaryNav": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalEyebrowNavMobile": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalEyebrowNav": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalLefthandNav": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalMarketingMessages": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalAccountFlyout": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "ArrangeFit": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalSearch": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalEmailSignup": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalSocialIcons": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalFooter": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   },
   "GlobalEmailSignupModal": {
     enable: true,
-    strategy: "simple"
+    strategy: "simple",
+    genCacheKey: genHeaderKey
   }
 };
 
@@ -231,51 +316,10 @@ var lookup = {
   "@5@": "foo.bar.b"
 };
 
-/* non string keys that can be templatized */
-const whitelistNonStringKeys = [
-  // "price",
-  // "savingsPrice",
-  // "wasPrice",
-  // "listPrice",
-  // "unitPrice",
-  // "averageRating",
-  // "numberOfReviews"
-];
-
-/* keys that should not be templatized */
-const preserveKeys = [
-  "lifeCycleStatus",
-  "availabilityStatus",
-  "isAValidOffer",
-  "variantType",
-  "variantTypes",
-  "variants"
-];
-
-const omit = _.omitBy ? _.omitBy : _.omit;
-const propsToOmit = ["moduleData",
-  "moduleType",
-  "moduleVersion",
-  "moduleTypeComponentMap",
-  "zoneName",
-  "children"];
-
-const EMPTY_ID = -1;
-
-function genHeaderKey(props) {
-  const filteredProps = omit(props, function (value, key) {
-    return (propsToOmit.indexOf(key) > EMPTY_ID || _.isFunction(value));
-  });
-  if (props.moduleData) {
-    filteredProps.publishedDate = props.moduleData.publishedDate;
-  }
-  return JSON.stringify(filteredProps);
-}
-
 //
 // generate template for cache strategy template
 //
-function generateTemplate(props) {
+function generateTemplate(props, opts) {
   const template = {};
   const lookup = {};
   const path = [];
@@ -289,7 +333,7 @@ function generateTemplate(props) {
       const v = obj[k];
       cacheKey.push(k);
       //cacheKey.push(typeof v);
-      if (preserveKeys.indexOf(k) >= 0) {
+      if (opts.preserveKeys.indexOf(k) >= 0) {
         tmpl[k] = v;
         cacheKey.push(JSON.stringify(v));
       } else if (typeof v === "function") {
@@ -311,11 +355,15 @@ function generateTemplate(props) {
           tmpl[k] = v;
         } else {
           const templateValue = `@'${index}"@`;
-          const lv = v.toLowerCase();
-          if (lv.startsWith("http://")) {
-            tmpl[k] = "http://" + templateValue;
-          } else if (lv.startsWith("https://")) {
-            tmpl[k] = "https://" + templateValue;
+          if (config.stripUrlProtocol) {
+            const lv = v.toLowerCase();
+            if (lv.startsWith("http://")) {
+              tmpl[k] = "http://" + templateValue;
+            } else if (lv.startsWith("https://")) {
+              tmpl[k] = "https://" + templateValue;
+            } else {
+              tmpl[k] = templateValue;
+            }
           } else {
             tmpl[k] = templateValue;
           }
@@ -324,7 +372,7 @@ function generateTemplate(props) {
           cacheKey.push(`:${lookupKey}`);
           index++;
         }
-      } else if (v && whitelistNonStringKeys.indexOf(k) >= 0) {
+      } else if (v && opts.whiteListNonStringKeys.indexOf(k) >= 0) {
         tmpl[k] = `@'${index}"@`;
         const lookupKey = `@${index}@`;
         cacheKey.push(`:${lookupKey}`);
@@ -384,11 +432,13 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
     return r.replace(/(\@\'|\@&#x27;)([0-9]+)(\"\@|\&quot;\@)/g, function (m, a, b, c) {
       let v = _.get(realProps, lookup[`@${b}@`]);
       if (typeof v === "string") {
-        let lv = v.toLowerCase();
-        if (lv.startsWith("http://")) {
-          v = v.substr(7);
-        } else if (lv.startsWith("https://")) {
-          v = v.substr(8);
+        if (config.stripUrlProtocol) {
+          let lv = v.toLowerCase();
+          if (lv.startsWith("http://")) {
+            v = v.substr(7);
+          } else if (lv.startsWith("https://")) {
+            v = v.substr(8);
+          }
         }
         if (a === `@'`) {
           return v;
@@ -415,30 +465,51 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
 
   const a = config.profiling && process.hrtime();
 
+  const profileTime = () => {
+    if (config.profiling) {
+      const d = process.hrtime(a);
+      const owner = currentElement._owner;
+
+      if (owner) {
+        (owner.__p[name] || (owner.__p[name] = [])).push(this.__p);
+      } else {
+        (profileData[name] || (profileData[name] = [])).push(this.__p);
+      }
+
+      assert(this.__p.time === undefined);
+
+      this.__p.time = d[0] * 1000.0 + d[1] / 1000000.0;
+    }
+  };
+
+
   let cacheType = "NONE";
+  let opts;
   const parentCached = rootID.startsWith(TMP_ROOT_ID);
   const bl = blackListed[name];
-  const canCache = !bl && whiteListed[name] && whiteListed[name].enable && !(parentCached ||
+  const canCache = !bl && (opts = whiteListed[name]) && opts.enable && !(parentCached ||
     _.isEmpty(saveProps) || typeof saveProps.children === "object");
   const doCache = config.caching && canCache;
 
   if (doCache) {
-    const strategy = whiteListed[name].strategy;
+    const strategy = opts.strategy;
     if (strategy === "simple") {
       cacheType = "cache";
-      template = {cacheKey: genHeaderKey(saveProps)};
+      template = {cacheKey: opts.genCacheKey ? opts.genCacheKey(saveProps) : JSON.stringify(saveProps)};
       key = config.hashKey ? FarmHash.hash64(template.cacheKey) : template.cacheKey;
       cached = cacheStore.getEntry(name, key);
       if (cached && cached.confidence >= 2) {
+        profileTime();
         return config.debug ? `<!-- component ${name} cacheType HIT ${key} -->${cached.html}` : cached.html;
       }
     } else if (strategy === "template") {
       cacheType = "cache";
-      template = generateTemplate(saveProps);
+      template = generateTemplate(saveProps, opts);
       key = config.hashKey ? FarmHash.hash64(template.cacheKey) : template.cacheKey;
       cached = cacheStore.getEntry(name, key);
       if (cached && cached.confidence >= 2) {
         const r = templatePostProcess(cached.html, template.lookup, saveProps);
+        profileTime();
         return config.debug ? `<!-- component ${name} cacheType HIT ${key} -->${r}` : r;
       }
     }
@@ -448,7 +519,7 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
     cacheType = "blackListed";
   } else if (config.debug && debugComponents[name]) {
     cacheType = "debugNone";
-    key = generateTemplate(saveProps).cacheKey;
+    key = generateTemplate(saveProps, {preserveKeys: [], whiteListNonStringKeys: []}).cacheKey;
   }
 
   let tmpRootID = rootID;
@@ -477,20 +548,7 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
     }
   }
 
-  if (config.profiling) {
-    const d = process.hrtime(a);
-    const owner = currentElement._owner;
-
-    if (owner) {
-      (owner.__p[name] || (owner.__p[name] = [])).push(this.__p);
-    } else {
-      (profileData[name] || (profileData[name] = [])).push(this.__p);
-    }
-
-    assert(this.__p.time === undefined);
-
-    this.__p.time = d[0] * 1000.0 + d[1] / 1000000.0;
-  }
+  profileTime();
 
   if (config.caching && config.debug) {
     return `<!-- component ${name} cacheType ${cacheType} ${key} -->${r}`;
@@ -498,8 +556,6 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
     return r;
   }
 };
-
-exports.config = config;
 
 exports.enableProfiling = function (flag) {
   config.profiling = flag === undefined || !!flag;
@@ -509,6 +565,10 @@ exports.enableProfiling = function (flag) {
 exports.enableCaching = function (flag) {
   config.caching = flag === undefined || !!flag;
   config.enabled = config.profiling || config.caching;
+};
+
+exports.stripUrlProtocol = function (flag) {
+  config.stripUrlProtocol = flag;
 };
 
 exports.profileData = profileData;
