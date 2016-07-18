@@ -1,5 +1,7 @@
 "use strict";
 
+/* eslint-disable no-magic-numbers */
+
 const ReactCompositeComponent = require("react/lib/ReactCompositeComponent");
 const assert = require("assert");
 const _ = require("lodash");
@@ -25,9 +27,9 @@ exports.setHashKey = function (flag) {
 
   if (config.hashKey) {
     try {
-      FarmHash = require("farmhash");
+      FarmHash = require("farmhash"); // eslint-disable-line
     } catch (e) {
-      console.log("farmhash module not available, turning off hashKey");
+      console.log("farmhash module not available, turning off hashKey"); // eslint-disable-line
       config.hashKey = false;
     }
   }
@@ -65,8 +67,8 @@ CacheStore.prototype.newEntry = function (name, key, value) {
   const size = entryKey.length + value.html.length;
   const newSize = this.size + size;
   if (newSize > config.MAX_CACHE_SIZE) {
-    console.log("ssr react profiler caching - max cache size exceeded");
-    let freeSize = Math.max(size, config.minFreeCacheSize);
+    console.log("ssr react profiler caching - max cache size exceeded"); // eslint-disable-line
+    const freeSize = Math.max(size, config.minFreeCacheSize);
     this.cleanCache(Math.min(freeSize, config.maxFreeCacheSize));
   }
   this.cache[entryKey] = value;
@@ -96,10 +98,10 @@ let cacheStore = new CacheStore();
 // cache key is generated from props
 // generate template from props for cache strategy template
 //
-// Note: It's hard (or impossible) to template non-string props.  Since the code may behave differently
-// depending on a boolean being true/false, or a number with different values.
-// Even string props the code could behave differently base on what the value is.  For example,
-// collection status could be "PUBLISHED", "UNPUBLISHED", etc.
+// Note: It's hard (or impossible) to template non-string props.  Since the code may
+// behave differently depending on a boolean being true/false, or a number with different
+// values.  Even string props the code could behave differently base on what the value is.
+// For example, collection status could be "PUBLISHED", "UNPUBLISHED", etc.
 //
 // returns { template, lookup, cacheKey }
 //
@@ -110,7 +112,7 @@ function generateTemplate(props, opts) {
   let index = 0;
   const cacheKey = [];
 
-  const gen = (obj, tmpl) => {
+  const gen = (obj, tmpl) => {  // eslint-disable-line
     const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++) {
       const k = keys[i];
@@ -132,7 +134,7 @@ function generateTemplate(props, opts) {
         }
         path.push(k);
         gen(v, tmpl[k]);
-        isArray && cacheKey.push("]");
+        isArray && cacheKey.push("]"); // eslint-disable-line
         path.pop(k);
       } else if (typeof v === "string") {
         if (!v) {
@@ -141,10 +143,10 @@ function generateTemplate(props, opts) {
           const templateValue = `@'${index}"@`;
           if (config.stripUrlProtocol) {
             const lv = v.toLowerCase();
-            if (lv.startsWith("http://")) {
-              tmpl[k] = "http://" + templateValue;
+            if (lv.startsWith("http://")) { // eslint-disable-line
+              tmpl[k] = `http://${templateValue}`;
             } else if (lv.startsWith("https://")) {
-              tmpl[k] = "https://" + templateValue;
+              tmpl[k] = `https://${templateValue}`;
             } else {
               tmpl[k] = templateValue;
             }
@@ -152,7 +154,7 @@ function generateTemplate(props, opts) {
             tmpl[k] = templateValue;
           }
           const lookupKey = `@${index}@`;
-          lookup[lookupKey] = path.join(".") + "." + k;
+          lookup[lookupKey] = `${path.join(".")}.${k}`;
           cacheKey.push(`:${lookupKey}`);
           index++;
         }
@@ -160,7 +162,7 @@ function generateTemplate(props, opts) {
         tmpl[k] = `@'${index}"@`;
         const lookupKey = `@${index}@`;
         cacheKey.push(`:${lookupKey}`);
-        lookup[lookupKey] = path.join(".") + "." + k;
+        lookup[lookupKey] = `${path.join(".")}.${k}`;
         index++;
       } else {
         tmpl[k] = v;
@@ -184,7 +186,7 @@ const replacements = {
   "<": "&lt;",
   ">": "&gt;",
   "'": "&#x27;",
-  '"': "&quot;"
+  '"': "&quot;"  // eslint-disable-line
 };
 
 ReactCompositeComponent.Mixin._construct = ReactCompositeComponent.Mixin.construct;
@@ -194,14 +196,18 @@ ReactCompositeComponent.Mixin.construct = function (element) {
     if (config.profiling) {
       this.__p = {time: undefined};
     }
-    this._name = element.type && typeof element.type !== "string" && (element.type.name || element.type.displayName);
+    this._name = element.type && typeof element.type !== "string" &&
+      (element.type.name || element.type.displayName);
   }
   return this._construct(element);
 };
 
 ReactCompositeComponent.Mixin._mountComponent = ReactCompositeComponent.Mixin.mountComponent;
 
-ReactCompositeComponent.Mixin.mountComponent = function mountComponent(rootID, transaction, context) {
+/*
+ * If can't find a name for the component then don't botherwith profiling/caching
+ */
+ReactCompositeComponent.Mixin.mountComponent = function mountComponent(rootID, transaction, context) { // eslint-disable-line
   return this._name ?
     this.mountComponentCache(rootID, transaction, context)
     : this._mountComponent(rootID, transaction, context);
@@ -225,17 +231,17 @@ ReactCompositeComponent.Mixin.__profileTime = function (start) {
   }
 };
 
-ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache(rootID, transaction, context) {
+ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache(rootID, transaction, context) { // eslint-disable-line
   const updateReactId = (r) => {
     return r.replace(tmpRootIdRegex, rootID);
   };
 
   const restoreRealProps = (r, lookup, realProps) => {
-    return r.replace(/(\@\'|\@&#x27;)([0-9]+)(\"\@|\&quot;\@)/g, function (m, a, b, c) {
+    return r.replace(/(\@\'|\@&#x27;)([0-9]+)(\"\@|\&quot;\@)/g, (m, a, b) => {
       let v = _.get(realProps, lookup[`@${b}@`]);
       if (typeof v === "string") {
         if (config.stripUrlProtocol) {
-          let lv = v.toLowerCase();
+          const lv = v.toLowerCase();
           if (lv.startsWith("http://")) {
             v = v.substr(7);
           } else if (lv.startsWith("https://")) {
@@ -245,8 +251,8 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
         if (a === `@'`) {
           return v;
         }
-        return v.replace(/([&<'">])/g, (m, c) => {
-          return replacements[c];
+        return v.replace(/([&<'">])/g, (m2, c2) => {
+          return replacements[c2];
         });
       } else {
         return v;
@@ -259,13 +265,15 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
     return updateReactId(r);
   };
 
-  let template, cached, key;
+  let template;
+  let cached;
+  let key;
 
   const currentElement = this._currentElement;
   const saveProps = currentElement.props;
   const name = this._name;
 
-  const a = config.profiling && process.hrtime();
+  const startTime = config.profiling && process.hrtime();
 
   let cacheType = "NONE";
   let opts;
@@ -283,12 +291,15 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
     const strategy = opts.strategy;
     if (strategy === "simple") {
       cacheType = "cache";
-      template = {cacheKey: opts.genCacheKey ? opts.genCacheKey(saveProps) : JSON.stringify(saveProps)};
+      template = {
+        cacheKey: opts.genCacheKey ? opts.genCacheKey(saveProps) : JSON.stringify(saveProps)
+      };
       key = config.hashKey ? FarmHash.hash64(template.cacheKey) : template.cacheKey;
       cached = cacheStore.getEntry(name, key);
       if (cached) {
-        config.profiling && this.__profileTime(a);
-        return config.debug ? `<!-- component ${name} cacheType HIT ${key} -->${cached.html}` : cached.html;
+        config.profiling && this.__profileTime(startTime); // eslint-disable-line
+        return config.debug ?
+          `<!-- component ${name} cacheType HIT ${key} -->${cached.html}` : cached.html;
       }
     } else if (strategy === "template") {
       cacheType = "cache";
@@ -297,7 +308,7 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
       cached = cacheStore.getEntry(name, key);
       if (cached) {
         const r = templatePostProcess(cached.html, template.lookup, saveProps);
-        config.profiling && this.__profileTime(a);
+        config.profiling && this.__profileTime(startTime); // eslint-disable-line
         return config.debug ? `<!-- component ${name} cacheType HIT ${key} -->${r}` : r;
       }
     }
@@ -336,7 +347,7 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
     }
   }
 
-  config.profiling && this.__profileTime();
+  config.profiling && this.__profileTime(startTime); // eslint-disable-line
 
   if (config.caching && config.debug) {
     return `<!-- component ${name} cacheType ${cacheType} ${key} -->${r}`;
@@ -382,13 +393,13 @@ exports.cacheEntries = function () {
 exports.cacheHitReport = function () {
   Object.keys(cacheStore.cache).forEach((key) => {
     const entry = cacheStore.cache[key];
-    console.log(`Cache Entry ${key} Hits ${entry.hits}`);
-  })
+    console.log(`Cache Entry ${key} Hits ${entry.hits}`); // eslint-disable-line
+  });
 };
 
-exports.setCachingConfig = function (config) {
-  cacheComponents = config.components;
-  debugComponents = config.debugComponents;
+exports.setCachingConfig = function (cfg) {
+  cacheComponents = cfg.components;
+  debugComponents = cfg.debugComponents;
 };
 
 exports.blackListed = blackListed;
