@@ -3,6 +3,7 @@
 const ReactCompositeComponent = require("react/lib/ReactCompositeComponent");
 const assert = require("assert");
 const _ = require("lodash");
+let FarmHash;  // load the farmhash module if it's available and config.hashKey is true
 
 const config = {
   enabled: false,
@@ -11,249 +12,28 @@ const config = {
   debug: false,
   hashKey: true,
   stripUrlProtocol: true,
-  MAX_CACHE_SIZE: 50 * 1024 * 1024 // 50Meg
+  cacheExpireTime: 15 * 60 * 1000,   // 15 min
+  MAX_CACHE_SIZE: 50 * 1024 * 1024,  // 50Meg
+  minFreeCacheSize: 1024 * 1024,     // 1 Meg - min size to free when cache is full
+  maxFreeCacheSize: 10 * 1024 * 1024 // 10 Meg - max size to free when cache is full
 };
 
-let FarmHash;
-
-if (config.hashKey) {
-  try {
-    FarmHash = require("farmhash");
-  } catch (e) {
-    console.log("farmhash module not available, turning off hashKey");
-    config.hashKey = false;
+exports.setHashKey = function (flag) {
+  if (typeof flag === "boolean") {
+    config.hashKey = flag;
   }
-}
 
-const profileData = {};
-
-/* non string keys that can be templatized */
-const whiteListNonStringKeys = [
-  // "price",
-  // "savingsPrice",
-  // "wasPrice",
-  // "listPrice",
-  // "unitPrice",
-  // "averageRating",
-  // "numberOfReviews"
-];
-
-/* keys that should not be templatized */
-const preserveKeys = [
-  "lifeCycleStatus",
-  "availabilityStatus",
-  "isAValidOffer",
-  "variantType",
-  "variantTypes",
-  "variants"
-];
-
-const omit = _.omitBy ? _.omitBy : _.omit;
-const propsToOmit = ["moduleData",
-  "moduleType",
-  "moduleVersion",
-  "moduleTypeComponentMap",
-  "zoneName",
-  "children"];
-
-function genHeaderKey(props) {
-  const filteredProps = omit(props, function (value, key) {
-    return (propsToOmit.indexOf(key) > -1 || _.isFunction(value));
-  });
-  if (props.moduleData) {
-    filteredProps.publishedDate = props.moduleData.publishedDate;
-  }
-  return JSON.stringify(filteredProps);
-}
-
-const blackListed = {};
-const whiteListed = {
-  // product collection
-  "ProductQuantity": {
-    enable: false,  // quantity has to be dynamic
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "ProductInformation": {
-    enable: false, // can't cache due to dynamic price
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "ProductCard": {
-    enable: false,  // contains ProductInformation
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "ProductOffer": {
-    enable: false,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "ProductImage": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "Layout": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "HeroImagery": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "About": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "ProductCallToAction": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "JSMediaSelector": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "RadonSelectOption": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "Chooser.Option": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "RadonSelect": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "PriceHero": {
-    enable: false,
-    strategy: "template",
-    preserveKeys
-  },
-  "Link": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  "Image": {
-    enable: true,
-    strategy: "template",
-    preserveKeys
-  },
-  "ProductPrimaryCTA": {
-    enable: true,
-    strategy: "template",
-    preserveKeys,
-    whiteListNonStringKeys
-  },
-  // Header
-  "GlobalLefthandNavMobile": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalSecondaryNav": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalEyebrowNavMobile": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalEyebrowNav": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalLefthandNav": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalMarketingMessages": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalAccountFlyout": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "ArrangeFit": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalSearch": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalEmailSignup": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalSocialIcons": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalFooter": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
-  },
-  "GlobalEmailSignupModal": {
-    enable: true,
-    strategy: "simple",
-    genCacheKey: genHeaderKey
+  if (config.hashKey) {
+    try {
+      FarmHash = require("farmhash");
+    } catch (e) {
+      console.log("farmhash module not available, turning off hashKey");
+      config.hashKey = false;
+    }
   }
 };
 
-const debugComponents = {
-  "ProductCallToAction": true
-};
-
-// if props has children then can't cache
-// if owner is already caching, then no cache
-
-// cache key is generated from props
-
-// generate template from props
-
-//
-// It's hard (or impossible) to template non-string props.  Since the code may behave differently
-// depending on a boolean being true/false, or a number with different values.
-// Even string props the code could behave differently base on what the value is.  For example,
-// collection status could be "PUBLISHED", "UNPUBLISHED", etc.
-//
+exports.setHashKey();
 
 function CacheStore() {
   this.cache = {};
@@ -261,63 +41,67 @@ function CacheStore() {
   this.entries = 0;
 }
 
+CacheStore.prototype.cleanCache = function (minFreeSize) {
+  const keys = Object.keys(this.cache);
+  keys.sort((a, b) => this.cache[a].access - this.cache[b].access);
+  const now = Date.now();
+  let freed = 0;
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const entry = this.cache[key];
+    delete this.cache[key];
+    const freeSize = key.length + entry.value.html.length;
+    freed += freeSize;
+    this.size -= freeSize;
+    this.entries--;
+    if (now - entry.access < config.cacheExpireTime && freed >= minFreeSize) {
+      break;
+    }
+  }
+};
+
 CacheStore.prototype.newEntry = function (name, key, value) {
-  const c = this.cache[name] || (this.cache[name] = {});
-  c[key] = value;
-  value.hits = 0;
-  c.access = value.access = Date.now();
-  const size = key.length + value.html.length;
+  const entryKey = `${name}-${key}`;
+  const size = entryKey.length + value.html.length;
   const newSize = this.size + size;
   if (newSize > config.MAX_CACHE_SIZE) {
     console.log("ssr react profiler caching - max cache size exceeded");
+    let freeSize = Math.max(size, config.minFreeCacheSize);
+    this.cleanCache(Math.min(freeSize, config.maxFreeCacheSize));
   }
+  this.cache[entryKey] = value;
+  value.hits = 0;
+  value.access = Date.now();
   this.size = newSize;
   this.entries++;
 };
 
 CacheStore.prototype.getEntry = function (name, key) {
-  const c = this.cache[name] || (this.cache[name] = {});
-  const x = c[key];
+  const entryKey = `${name}-${key}`;
+  const x = this.cache[entryKey];
   if (x) {
     x.hits++;
-    c.access = x.access = Date.now();
+    x.access = Date.now();
   }
   return x;
 };
 
-const cacheStore = new CacheStore();
-
-// example tempate:
-
-var props = {
-  foo: {
-    bar: {
-      a: [0, 1, 2, 3, 4],
-      b: "hello"
-    }
-  }
-};
-
-var template = {
-  foo: {
-    bar: {
-      a: [`@'0"@`, `@'1"@`, `@'2"@`, `@'3"@`, `@'4"@`],
-      b: `@'5"@`
-    }
-  }
-};
-
-var lookup = {
-  "@0@": "foo.bar.a.0",
-  "@1@": "foo.bar.a.1",
-  "@2@": "foo.bar.a.2",
-  "@3@": "foo.bar.a.3",
-  "@4@": "foo.bar.a.4",
-  "@5@": "foo.bar.b"
-};
+const profileData = {};
+const blackListed = {};
+let cacheComponents = {};
+let debugComponents = {};
+let cacheStore = new CacheStore();
 
 //
-// generate template for cache strategy template
+// cache key is generated from props
+// generate template from props for cache strategy template
+//
+// Note: It's hard (or impossible) to template non-string props.  Since the code may behave differently
+// depending on a boolean being true/false, or a number with different values.
+// Even string props the code could behave differently base on what the value is.  For example,
+// collection status could be "PUBLISHED", "UNPUBLISHED", etc.
+//
+// returns { template, lookup, cacheKey }
 //
 function generateTemplate(props, opts) {
   const template = {};
@@ -423,6 +207,24 @@ ReactCompositeComponent.Mixin.mountComponent = function mountComponent(rootID, t
     : this._mountComponent(rootID, transaction, context);
 };
 
+ReactCompositeComponent.Mixin.__profileTime = function (start) {
+  if (config.profiling) {
+    const name = this._name;
+    const d = process.hrtime(start);
+    const owner = this._currentElement._owner;
+
+    if (owner) {
+      (owner.__p[name] || (owner.__p[name] = [])).push(this.__p);
+    } else {
+      (profileData[name] || (profileData[name] = [])).push(this.__p);
+    }
+
+    assert(this.__p.time === undefined);
+
+    this.__p.time = d[0] * 1000.0 + d[1] / 1000000.0;
+  }
+};
+
 ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache(rootID, transaction, context) {
   const updateReactId = (r) => {
     return r.replace(tmpRootIdRegex, rootID);
@@ -465,30 +267,16 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
 
   const a = config.profiling && process.hrtime();
 
-  const profileTime = () => {
-    if (config.profiling) {
-      const d = process.hrtime(a);
-      const owner = currentElement._owner;
-
-      if (owner) {
-        (owner.__p[name] || (owner.__p[name] = [])).push(this.__p);
-      } else {
-        (profileData[name] || (profileData[name] = [])).push(this.__p);
-      }
-
-      assert(this.__p.time === undefined);
-
-      this.__p.time = d[0] * 1000.0 + d[1] / 1000000.0;
-    }
-  };
-
-
   let cacheType = "NONE";
   let opts;
   const parentCached = rootID.startsWith(TMP_ROOT_ID);
   const bl = blackListed[name];
-  const canCache = !bl && (opts = whiteListed[name]) && opts.enable && !(parentCached ||
+
+  // if props has children then can't cache
+  // if owner is already caching, then no need to cache
+  const canCache = !bl && (opts = cacheComponents[name]) && opts.enable && !(parentCached ||
     _.isEmpty(saveProps) || typeof saveProps.children === "object");
+
   const doCache = config.caching && canCache;
 
   if (doCache) {
@@ -498,8 +286,8 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
       template = {cacheKey: opts.genCacheKey ? opts.genCacheKey(saveProps) : JSON.stringify(saveProps)};
       key = config.hashKey ? FarmHash.hash64(template.cacheKey) : template.cacheKey;
       cached = cacheStore.getEntry(name, key);
-      if (cached && cached.confidence >= 2) {
-        profileTime();
+      if (cached) {
+        config.profiling && this.__profileTime(a);
         return config.debug ? `<!-- component ${name} cacheType HIT ${key} -->${cached.html}` : cached.html;
       }
     } else if (strategy === "template") {
@@ -507,9 +295,9 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
       template = generateTemplate(saveProps, opts);
       key = config.hashKey ? FarmHash.hash64(template.cacheKey) : template.cacheKey;
       cached = cacheStore.getEntry(name, key);
-      if (cached && cached.confidence >= 2) {
+      if (cached) {
         const r = templatePostProcess(cached.html, template.lookup, saveProps);
-        profileTime();
+        config.profiling && this.__profileTime(a);
         return config.debug ? `<!-- component ${name} cacheType HIT ${key} -->${r}` : r;
       }
     }
@@ -536,19 +324,19 @@ ReactCompositeComponent.Mixin.mountComponentCache = function mountComponentCache
   if (template) {
     currentElement.props = saveProps;
     if (!cached) {
-      cacheStore.newEntry(name, key, {html: r, confidence: 0});
-    } else if (cached.html === r) {
-      cached.confidence++;
-    } else {
-      blackListed[name] = true;
-      cached.confidence = -1;
+      cacheStore.newEntry(name, key, {html: r});
+    } else if (config.debug) {
+      if (cached.html !== r) {
+        blackListed[name] = true;
+      }
     }
+
     if (template.lookup) {
       r = templatePostProcess(r, template.lookup, saveProps);
     }
   }
 
-  profileTime();
+  config.profiling && this.__profileTime();
 
   if (config.caching && config.debug) {
     return `<!-- component ${name} cacheType ${cacheType} ${key} -->${r}`;
@@ -579,6 +367,10 @@ exports.clearProfileData = function () {
   });
 };
 
+exports.clearCache = function () {
+  cacheStore = new CacheStore();
+};
+
 exports.cacheSize = function () {
   return cacheStore.size;
 };
@@ -588,16 +380,18 @@ exports.cacheEntries = function () {
 };
 
 exports.cacheHitReport = function () {
-  Object.keys(cacheStore.cache).forEach((name) => {
-    const componentCache = cacheStore.cache[name];
-    Object.keys(componentCache).forEach((key) => {
-      if (key !== "access") {
-        console.log(`Cache Entry ${name}-${key} Hits ${componentCache[key].hits}`);
-      }
-    });
+  Object.keys(cacheStore.cache).forEach((key) => {
+    const entry = cacheStore.cache[key];
+    console.log(`Cache Entry ${key} Hits ${entry.hits}`);
   })
+};
+
+exports.setCachingConfig = function (config) {
+  cacheComponents = config.components;
+  debugComponents = config.debugComponents;
 };
 
 exports.blackListed = blackListed;
 
 exports.cache = cacheStore;
+

@@ -1,7 +1,7 @@
 {
   "name": "electrode-react-ssr-profiler",
   "version": "1.0.0",
-  "description": "Helps profiling time each React composite component takes in SSR",
+  "description": "Helps profiling time each React composite component takes in SSR and provides component caching support",
   "main": "index.js",
   "scripts": {
     "test": "echo no test"
@@ -12,5 +12,19 @@
   },
   "keywords": [],
   "author": "Joel Chen <xchen@walmartlabs.com>",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "optionalDependencies": {
+    "farmhash": "^1.1.1"
+  },
+  "peerDependencies": {
+    "react": "^0.14.8"
+  },
+  "devDependencies": {
+    "@walmart/electrode-archetype-njs-module-dev": "^1.0.1",
+    "builder": "^2.10.1",
+    "react": "^0.14.8"
+  },
+  "dependencies": {
+    "lodash": "^4.13.1"
+  }
 }
