@@ -1,6 +1,6 @@
 {
   "name": "@walmart/electrode-react-ssr-profiler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Helps profiling time each React composite component takes in SSR and provides component caching support",
   "main": "lib/ssr-profiler.js",
   "scripts": {
