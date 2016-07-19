@@ -2,6 +2,7 @@
 
 import React, { Component } from "react";
 import InfoCard from "./info-card";
+import Heading from "./heading";
 
 export default class Board extends Component {
   _renderUser (user) {
@@ -10,7 +11,7 @@ export default class Board extends Component {
 
   render () {
     return <div>
-      <h1>Board</h1>
+      <Heading title="Board" />
       {this.props.users.map(this._renderUser)}
     </div>;
   }
