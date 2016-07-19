@@ -1,6 +1,6 @@
 "use strict";
 
-// test profiling feature
+// test cache store feature
 
 const CacheStore = require("../../lib/cache-store");
 

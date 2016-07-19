@@ -1,6 +1,6 @@
 "use strict";
 
-// test profiling feature
+// test hash key feature
 
 const SSRProfiler = require("../..");
 const Module = require("module");

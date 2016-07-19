@@ -1,6 +1,6 @@
 "use strict";
 
-// test profiling feature
+// test simple caching feature
 
 const SSRProfiler = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
