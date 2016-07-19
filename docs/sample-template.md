@@ -1,5 +1,6 @@
-// example template for the template cache strategy:
+# example template for the template cache strategy:
 
+```js
 var props = {
   foo: {
     bar: {
@@ -26,3 +27,5 @@ var lookup = {
   "@4@": "foo.bar.a.4",
   "@5@": "foo.bar.b"
 };
+```
+

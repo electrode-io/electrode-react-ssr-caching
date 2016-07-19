@@ -15,14 +15,17 @@ This module should be loaded as early as possible in order to install the hook t
 You just need to require it:
 
 ```js
-var ssrReactProfiler = require("@walmart/electrode-react-ssr-profiler");
+var SSRProfiler = require("@walmart/electrode-react-ssr-profiler");
 ```
 
 Then when you call `ReactDOM.renderToString`, do:
 
 ```
-ssrReactProfiler.clearProfileData();
-var html = ReactDOM.renderToString();
-console.log(JSON.stringify(ssrReactProfiler.profileData, null, 2));
+// First you should render your component in a loop to prime the V8 engine
+
+SSRProfiler.clearProfileData();
+SSRProfiler.enableProfiling();
+var html = ReactDOM.renderToString(<MyComponent />);
+console.log(JSON.stringify(SSRProfiler.profileData, null, 2));
 ```
 
