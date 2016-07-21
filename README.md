@@ -99,8 +99,65 @@ This strategy is not very flexible.  You need a cache entry for each different p
 
 #### template
 
-The `template` is more complex but flexible.  
+The `template` caching strategy is more complex but flexible.  
 
 The idea is akin to generating logic-less handlebars template from your React components and then use string replace to process the template with different props. 
+
+If you have this component:
+
+```js
+class Hello extends Component {
+    render() {
+        return <div>Hello, {this.props.name}.  {this.props.message}</div>
+    }
+}
+```
+
+And you render it with props:
+```js
+const props = { name: "Bob", message: "How're you?" }
+```
+
+You get back HTML string:
+```html
+<div>Hello, <span>Bob</span>.  <span>How&#x27;re you?</span></div>
+```
+
+Now if you replace values in props with tokens, and you remember that `@0@` refers to `props.name` and `@1@` refers to `props.message`:
+```js
+const tokenProps = { name: "@0@", message: "@1@" }
+```
+
+You get back HTML string that could be akin to a handlebars template:
+```html
+<div>Hello, <span>@0@</span>.  <span>@1@</span></div>
+```
+
+We cache this template html using the tokenized props as cache key.  When we need to render the same component with a different props later, we can just lookup the template from cache and use string replace to apply the values:
+```js
+cachedTemplateHtml.replace( /@0@/g, props.name ).replace( /@1@/g, props.message );
+```
+
+That's the gist of the template strategy.  Of course there are many small details such as handling the encoding of special characters, preserving props that can't be tokenized, avoid tokenizing non-string props, or preserving `data-reactid` and `data-react-checksum`.
+
+To specify a component to be cached with the `template` strategy:
+
+```js
+const cacheConfig = {
+    components: {
+        Hello: {
+            strategy: "template",
+            enable: true,
+            preserveKeys: [ "key1", "key2" ],
+            preserveEmptyKeys: [ "key3", "key4" ],
+            whiteListNonStringKeys: [ "key5", "key6" ]
+        }
+    }
+};
+```
+
+`preserveKeys` - List of keys that should not be tokenized.
+`preserveEmptyKeys` - List of keys that should not be tokenized if they are empty string `""`
+`whiteListNonStringKeys` - List of non-string keys that should be tokenized.
 
 [Sasha Aickin's talk]: https://www.youtube.com/watch?v=PnpfGy7q96U
