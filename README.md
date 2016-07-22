@@ -156,8 +156,8 @@ const cacheConfig = {
 };
 ```
 
-`preserveKeys` - List of keys that should not be tokenized.
-`preserveEmptyKeys` - List of keys that should not be tokenized if they are empty string `""`
-`whiteListNonStringKeys` - List of non-string keys that should be tokenized.
+   - `preserveKeys` - List of keys that should not be tokenized.
+   - `preserveEmptyKeys` - List of keys that should not be tokenized if they are empty string `""`
+   - `whiteListNonStringKeys` - List of non-string keys that should be tokenized.
 
 [Sasha Aickin's talk]: https://www.youtube.com/watch?v=PnpfGy7q96U
