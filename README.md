@@ -160,4 +160,59 @@ const cacheConfig = {
    - `preserveEmptyKeys` - List of keys that should not be tokenized if they are empty string `""`
    - `whiteListNonStringKeys` - List of non-string keys that should be tokenized.
 
+# API
+
+### [`enableProfiling(flag)`](#enableprofilingflag)
+
+Enable profiling according to flag
+
+   - `undefined` or `true` -  enable profiling
+   - `false` - disable profiling
+
+### [`enableCaching(flag)`](#enablecachingflag)
+
+Enable cache according to flag
+
+   - `undefined` or `true` - enable caching
+   - `false` - disable caching
+
+### [`enableCachingDebug(flag)`](#enablecachingdebugflag)
+
+Enable cache debugging according to flag.
+
+> Caching must be enabled for this to have any effect.
+
+   - `undefined` or `true` - enable cache debugging
+   - `false` - disable cache debugging
+
+### [`setCachingConfig(config)`](#setcachingconfigconfig)
+
+Set caching config to `config`.
+
+### [`stripUrlProtocol(flag)`](#stripurlprotocolflag)
+
+Remove `http:` or `https:` from prop values that are URLs according to flag.
+
+> Caching must be enabled for this to have any effect.
+
+   - `undefined` or `true` - strip URL protocol
+   - `false` - don't strip
+ 
+
+### [`clearProfileData()`](#clearprofiledata)
+
+Clear profiling data
+
+### [`clearCache()`](#clearcache)
+
+Clear caching data
+
+### [`cacheEntries()`](#cacheentries)
+
+Get total number of cache entries
+
+### [`cacheHitReport()`](#cachehitreport)
+
+Print out cache entries and number of hits each one has.
+
 [Sasha Aickin's talk]: https://www.youtube.com/watch?v=PnpfGy7q96U
