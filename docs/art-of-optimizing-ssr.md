@@ -82,9 +82,52 @@ promise.then( () => {
 });
 ```
 
+> You should save the profile data to a file rather than log it to the console.
+
 ## Identifying
 
-- trying out
+Once you get the JSON data with timing on your components, you can identify what's happening and which components are the most expensive to render.
 
-- inspecting
+Here is a simple example of how the profiling data might look like in YAML format.
+
+> If you are using Redux you would see Redux's helper components such as `Connect` or `Provider`
+
+```yaml
+---
+  Board:
+    -
+      time: 3.652683
+      Heading:
+        -
+          time: 0.379035
+      InfoCard:
+        -
+          time: 1.492614
+          Hello:
+            -
+              time: 0.230108
+        -
+          time: 0.30988
+          Hello:
+            -
+              time: 0.095122
+        -
+          time: 0.50647
+          Hello:
+            -
+              time: 0.162786
+```
+
+The time is in milliseconds.  As you can see from the above data, here is what it means:
+
+   - Component `Board` took `3.652683ms` to render and it contain children `Heading` and `InfoCard`
+   - `Heading` took `0.379035ms` to render
+   - There are 3 instances of `InfoCard`, each one took slightly different time to render and has `Hello` as child.
+
+> I didn't prime the JS engine when I collected the above data so you can see the first `InfoCard` instance took the longest to render.
+
+## Testing
+
+## Inspecting
+
 
