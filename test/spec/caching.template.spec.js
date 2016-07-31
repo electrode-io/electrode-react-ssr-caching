@@ -83,6 +83,7 @@ describe("SSRProfiler template caching", function () {
       quote: "blah",
       preserve: "preserve",
       empty: "",
+      ignore: "ignore-me",
       urls: [
         "http://zzzzl.com/xchen11",
         "https://github.com/jchip"
@@ -152,6 +153,7 @@ describe("SSRProfiler template caching", function () {
         enable: true,
         preserveKeys: ["preserve"],
         preserveEmptyKeys: ["empty"],
+        ignoreKeys: ["ignore"],
         whiteListNonStringKeys: ["random", "distance"]
       }
     }
@@ -194,6 +196,9 @@ describe("SSRProfiler template caching", function () {
     expect(Object.keys(cache)).to.deep.equal(keys);
     keys.forEach((x) => {
       expect(cache[x].hits).to.equal(1);
+      if (!hashKeys) {
+        expect(x).not.includes("ignore");
+      }
     });
     if (!stripUrlProtocol) {
       r2 = verifyAndRemoveUrlProtocol(r2);

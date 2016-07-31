@@ -150,7 +150,8 @@ const cacheConfig = {
             enable: true,
             preserveKeys: [ "key1", "key2" ],
             preserveEmptyKeys: [ "key3", "key4" ],
-            whiteListNonStringKeys: [ "key5", "key6" ]
+            ignoreKeys: [ "key5", "key6" ],
+            whiteListNonStringKeys: [ "key7", "key8" ]
         }
     }
 };
@@ -158,6 +159,7 @@ const cacheConfig = {
 
    - `preserveKeys` - List of keys that should not be tokenized.
    - `preserveEmptyKeys` - List of keys that should not be tokenized if they are empty string `""`
+   - `ignoreKeys` - List of keys that should be completely ignored as part of the template cache key.
    - `whiteListNonStringKeys` - List of non-string keys that should be tokenized.
 
 # API
@@ -198,6 +200,19 @@ Remove `http:` or `https:` from prop values that are URLs according to flag.
    - `undefined` or `true` - strip URL protocol
    - `false` - don't strip
  
+### [`shouldHashKeys(flag, [hashFn])`](#shouldhashkeysflaghashfn)
+
+Set whether the `template` strategy should hash the cache key and use that instead.
+
+> Caching must be enabled for this to have any effect.
+
+  - `flag`
+    - `undefined` or `true` - use a hash value of the cache key
+    - `false` - don't use a hash valueo f the cache key
+  - `hashFn` - optional, a custom callback to generate the hash from the cache key, which is passed in as a string
+    - i.e. `function customHashFn(key) { return hash(key); }`
+
+If no `hashFn` is provided, then [farmhash] is used if it's available, otherwise hashing is turned off.
 
 ### [`clearProfileData()`](#clearprofiledata)
 
@@ -216,3 +231,4 @@ Get total number of cache entries
 Print out cache entries and number of hits each one has.
 
 [Sasha Aickin's talk]: https://www.youtube.com/watch?v=PnpfGy7q96U
+[farmhash]: https://github.com/google/farmhash
