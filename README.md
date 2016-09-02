@@ -5,7 +5,7 @@ Support React Server Side Rendering profiling to inspect the time each component
 # Installing
 
 ```
-npm i @walmart/electrode-react-ssr-profiler
+npm i electrode-react-ssr-profiler
 ```
 
 # Usage
@@ -15,7 +15,7 @@ npm i @walmart/electrode-react-ssr-profiler
 You can use this module to inspect the time each component took to render.
 
 ```js
-import SSRProfiler from "@walmart/electrode-react-ssr-profiler";
+import SSRProfiler from "electrode-react-ssr-profiler";
 import { renderToString } from "react-dom/server";
 import MyComponent from "mycomponent";
 
@@ -38,7 +38,7 @@ Once you determined the most expensive components with profiling, you can enable
 The basic steps to enabling caching are:
 
 ```js
-import SSRProfiler from "@walmart/electrode-react-ssr-profiler";
+import SSRProfiler from "electrode-react-ssr-profiler";
 
 SSRProfiler.enableCaching();
 SSRProfiler.setCachingConfig(cacheConfig);
