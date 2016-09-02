@@ -40,7 +40,15 @@ describe("SSRProfiler template caching", function () {
   //
   it("should cache component with template strategy", function () {
     const message = "good morning";
+
+    // save render Hello with caching off
+    const rHello1 = renderHello("test", message); // eslint-disable-line
+
+    // save render Greeting with caching off
     const r1 = renderGreeting("test", message);
+
+    // Enable caching and test
+
     SSRProfiler.enableCaching();
     SSRProfiler.setCachingConfig({
       components: {
@@ -50,26 +58,42 @@ describe("SSRProfiler template caching", function () {
         }
       }
     });
+
     // should add an entry to cache with template key
+
     SSRProfiler.stripUrlProtocol(true);
     SSRProfiler.setHashKey(false);
+
     // first just render Hello by itself to create a cache with diff react-id's
-    const rHello = renderHello("test", message); // eslint-disable-line
+
+    renderHello("test", message); // eslint-disable-line
     const key1 = Object.keys(SSRProfiler.cacheStore.cache)[0];
     const keyTmpl = key1.substr(6);
     const entry1 = SSRProfiler.cacheStore.getEntry("Hello", keyTmpl);
     expect(entry1.hits).to.equal(1);
-    const rX = renderGreeting("test", message);
+
+    // render hello again and verify cache
+
+    const rHello2 = renderHello("test", message);
+    expect(rHello1).to.equal(rHello2);
     expect(entry1.hits).to.equal(2);
+
+    // render Greeting that has Hello inside and verify
+
+    const rX = renderGreeting("test", message);
+    expect(entry1.hits).to.equal(3);
     expect(r1).to.equal(rX);
 
     // should add an entry to cache with hashed key from template key
+
     SSRProfiler.setHashKey(true);
     const hashKey = SSRProfiler.hashKeyFn(keyTmpl);
     const r2 = renderGreeting("test", message);
     const entry = SSRProfiler.cacheStore.getEntry("Hello", hashKey);
     expect(entry.hits).to.equal(1);
+
     // now render should use result from cache
+
     const r3 = renderGreeting("test", message);
     expect(entry.hits).to.equal(2);
     expect(r2).includes(message);
