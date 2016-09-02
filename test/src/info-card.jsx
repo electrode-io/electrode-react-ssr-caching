@@ -2,6 +2,7 @@
 
 import React, {Component} from "react";
 import Hello from "./hello";
+import RecursiveDivs from "./recursive-divs"
 
 export default class InfoCard extends Component {
   _link(url, x) {
@@ -19,6 +20,7 @@ export default class InfoCard extends Component {
       Quote: {this.props.quote}
       Random: {this.props.random}
       <Hello {...this.props} />
+      <RecursiveDivs depth={4} breadth={8} secretMessage="abcdefghij"/>
     </div>;
   }
 }

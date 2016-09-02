@@ -197,41 +197,63 @@ describe("SSRProfiler template caching", function () {
 
   const testTemplate = (stripUrlProtocol, hashKeys, profiling) => {
     SSRProfiler.enableProfiling(profiling);
+
+    let start = Date.now();
     const r1 = renderBoard(users);
+    const r1Time = Date.now() - start;
+
     if (profiling) {
       const data = SSRProfiler.profileData;
       expect(data.Board[0].InfoCard[0].time).to.be.above(0);
       SSRProfiler.clearProfileData();
       SSRProfiler.enableProfiling(false);
     }
+
     SSRProfiler.enableCaching();
     SSRProfiler.setCachingConfig(cacheConfig);
     SSRProfiler.shouldHashKeys(hashKeys);
     SSRProfiler.stripUrlProtocol(stripUrlProtocol);
+
+    start = Date.now();
     let r2 = renderBoard(users);
+    const r2Time = Date.now() - start;
+
     const cache = SSRProfiler.cacheStore.cache;
     const keys = Object.keys(cache);
     keys.forEach((x) => {
       expect(cache[x].hits).to.equal(0);
     });
+
     SSRProfiler.enableProfiling(profiling);
+
+    start = Date.now();
     let r3 = renderBoard(users);
+    const r3Time = Date.now() - start;
+
     if (profiling) {
       const data = SSRProfiler.profileData;
       expect(data.Board[0].InfoCard[0].time).to.be.above(0);
       SSRProfiler.clearProfileData();
     }
+
+    console.log(`rendering time r1 ${r1Time}ms r2 ${r2Time}ms r3 (cached) ${r3Time}ms`);
+    expect(r3Time).below(r1Time);
+    expect(r3Time).below(r2Time);
+
     expect(Object.keys(cache)).to.deep.equal(keys);
+
     keys.forEach((x) => {
       expect(cache[x].hits).to.equal(1);
       if (!hashKeys) {
         expect(x).not.includes("ignore");
       }
     });
+
     if (!stripUrlProtocol) {
       r2 = verifyAndRemoveUrlProtocol(r2);
       r3 = verifyAndRemoveUrlProtocol(r3);
     }
+
     verifyRenderResults(r1, r2, r3, !stripUrlProtocol);
   };
 

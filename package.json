@@ -4,7 +4,7 @@
   "description": "Optimize React SSR with profiling and component caching",
   "main": "lib/ssr-profiler.js",
   "scripts": {
-    "test": "gulp check",
+    "test": "npm run build-test && gulp check",
     "build-test": "rm -f test/gen-lib/* && babel test/src -d test/gen-lib",
     "coverage": "npm run build-test && gulp test-cov"
   },
