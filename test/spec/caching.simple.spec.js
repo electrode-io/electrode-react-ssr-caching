@@ -40,11 +40,11 @@ describe("SSRProfiler simple caching", function () {
       }
     });
     // should add an entry to cache with key-simple
-    SSRProfiler.setHashKey(false);
+    SSRProfiler.shouldHashKeys(false);
     renderGreeting("test", message);
     expect(SSRProfiler.cacheStore.getEntry("Hello", "key-simple").hits).to.equal(1);
     // should add an entry to cache with hashed key from key-simple
-    SSRProfiler.setHashKey(true);
+    SSRProfiler.shouldHashKeys(true);
     const r2 = renderGreeting("test", message);
     const entry = SSRProfiler.cacheStore.getEntry("Hello", "1357465574333202611");
     expect(entry.hits).to.equal(1);
@@ -76,11 +76,11 @@ describe("SSRProfiler simple caching", function () {
       }
     });
     // should add an entry to cache with stringified props as cache key
-    SSRProfiler.setHashKey(false);
+    SSRProfiler.shouldHashKeys(false);
     renderGreeting("test", message);
     expect(SSRProfiler.cacheStore.getEntry("Hello", JSON.stringify({name: "test", message})).hits).to.equal(1);
     // should add an entry to cache with hashed value of key
-    SSRProfiler.setHashKey(true);
+    SSRProfiler.shouldHashKeys(true);
     const r2 = renderGreeting("test", message);
     const entry = SSRProfiler.cacheStore.getEntry("Hello", "2422985312975527455");
     expect(entry.hits).to.equal(1);

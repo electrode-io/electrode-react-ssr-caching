@@ -5,23 +5,23 @@
 const SSRProfiler = require("../..");
 const Module = require("module");
 
-describe("setHashKey", function () {
+describe("shouldHashKeys", function () {
   it("should enable with custom function", function () {
-    SSRProfiler.setHashKey(true, (s) => {
+    SSRProfiler.shouldHashKeys(true, (s) => {
       return `test${s}`;
     });
     expect(SSRProfiler.hashKeyFn("1")).to.equal("test1");
   });
 
   it("should disable with false", function () {
-    SSRProfiler.setHashKey(true, () => 0);
+    SSRProfiler.shouldHashKeys(true, () => 0);
     expect(typeof SSRProfiler.hashKeyFn).to.equal("function");
-    SSRProfiler.setHashKey(false);
+    SSRProfiler.shouldHashKeys(false);
     expect(SSRProfiler.hashKeyFn("12345")).to.equal("12345");
   });
 
   it("should use FarmHash", function () {
-    SSRProfiler.setHashKey(true);
+    SSRProfiler.shouldHashKeys(true);
     expect(SSRProfiler.hashKeyFn("hello, world")).to.equal("12299089882482858311");
   });
 
@@ -30,7 +30,7 @@ describe("setHashKey", function () {
     Module.prototype.require = () => {
       throw new Error("not found");
     };
-    SSRProfiler.setHashKey(true);
+    SSRProfiler.shouldHashKeys(true);
     expect(SSRProfiler.hashKeyFn("12345")).to.equal("12345");
     expect(SSRProfiler.config.hashKey).to.equal(false);
     Module.prototype.require = req;

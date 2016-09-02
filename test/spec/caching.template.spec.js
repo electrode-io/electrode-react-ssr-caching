@@ -62,7 +62,7 @@ describe("SSRProfiler template caching", function () {
     // should add an entry to cache with template key
 
     SSRProfiler.stripUrlProtocol(true);
-    SSRProfiler.setHashKey(false);
+    SSRProfiler.shouldHashKeys(false);
 
     // first just render Hello by itself to create a cache with diff react-id's
 
@@ -86,7 +86,7 @@ describe("SSRProfiler template caching", function () {
 
     // should add an entry to cache with hashed key from template key
 
-    SSRProfiler.setHashKey(true);
+    SSRProfiler.shouldHashKeys(true);
     const hashKey = SSRProfiler.hashKeyFn(keyTmpl);
     const r2 = renderGreeting("test", message);
     const entry = SSRProfiler.cacheStore.getEntry("Hello", hashKey);
@@ -206,7 +206,7 @@ describe("SSRProfiler template caching", function () {
     }
     SSRProfiler.enableCaching();
     SSRProfiler.setCachingConfig(cacheConfig);
-    SSRProfiler.setHashKey(hashKeys);
+    SSRProfiler.shouldHashKeys(hashKeys);
     SSRProfiler.stripUrlProtocol(stripUrlProtocol);
     let r2 = renderBoard(users);
     const cache = SSRProfiler.cacheStore.cache;
@@ -253,7 +253,7 @@ describe("SSRProfiler template caching", function () {
     SSRProfiler.enableCachingDebug(true);
     expect(SSRProfiler.config.debug).to.equal(true);
     SSRProfiler.setCachingConfig(cacheConfig);
-    SSRProfiler.setHashKey(false);
+    SSRProfiler.shouldHashKeys(false);
     const r2 = renderBoard(users);
     expect(r2).includes("<!-- component Board cacheType NONE");
     expect(r2).includes("<!-- component InfoCard cacheType cache");
