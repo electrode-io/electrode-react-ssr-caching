@@ -5,6 +5,7 @@
 const SSRProfiler = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
 const renderBoard = require("../gen-lib/render-board").default;
+const renderHello = require("../gen-lib/render-hello").default;
 const chai = require("chai");
 const expect = chai.expect;
 process.env.NODE_ENV = "production";
@@ -19,21 +20,19 @@ describe("SSRProfiler template caching", function () {
     SSRProfiler.enableProfiling(false);
   });
 
-  function removeReactId(html) {
-    const x = html.replace(/data-reactid\=\"[^\"]+\"/g, "");
-    return x.replace(/data-react-checksum\=\"[^\"]+\"/g, "").replace(/ *>/g, ">");
+  function removeReactChecksum(html) {
+    return html.replace(/data-react-checksum\=\"[^\"]+\"/g, "").replace(/ *>/g, ">");
   }
 
-  const verifyRenderResults = (r1, r2, r3) => {
-    chai.assert(r1 !== r2, "render1 and render2 should be different");
-    chai.assert(r1 !== r3, "render1 and render3 should be different");
-    chai.assert(r2 !== r3, "render2 and render3 should be different");
-    r1 = removeReactId(r1);
-    r2 = removeReactId(r2);
-    r3 = removeReactId(r3);
-    chai.assert(r1 === r2, "render1 and render2 should be the same");
-    chai.assert(r1 === r3, "render1 and render3 should be the same");
-    chai.assert(r2 === r3, "render2 and render3 should be the same");
+  const verifyRenderResults = (r1, r2, r3, cleanUp) => { // eslint-disable-line
+    if (cleanUp) {
+      r1 = removeReactChecksum(r1);
+      r2 = removeReactChecksum(r2);
+      r3 = removeReactChecksum(r3);
+    }
+    expect(r1).to.equal(r2);
+    expect(r1).to.equal(r3);
+    expect(r2).to.equal(r3);
   };
 
   //
@@ -54,11 +53,16 @@ describe("SSRProfiler template caching", function () {
     // should add an entry to cache with template key
     SSRProfiler.stripUrlProtocol(true);
     SSRProfiler.setHashKey(false);
-    renderGreeting("test", message);
+    // first just render Hello by itself to create a cache with diff react-id's
+    const rHello = renderHello("test", message); // eslint-disable-line
     const key1 = Object.keys(SSRProfiler.cacheStore.cache)[0];
     const keyTmpl = key1.substr(6);
     const entry1 = SSRProfiler.cacheStore.getEntry("Hello", keyTmpl);
     expect(entry1.hits).to.equal(1);
+    const rX = renderGreeting("test", message);
+    expect(entry1.hits).to.equal(2);
+    expect(r1).to.equal(rX);
+
     // should add an entry to cache with hashed key from template key
     SSRProfiler.setHashKey(true);
     const hashKey = SSRProfiler.hashKeyFn(keyTmpl);
@@ -204,7 +208,7 @@ describe("SSRProfiler template caching", function () {
       r2 = verifyAndRemoveUrlProtocol(r2);
       r3 = verifyAndRemoveUrlProtocol(r3);
     }
-    verifyRenderResults(r1, r2, r3);
+    verifyRenderResults(r1, r2, r3, !stripUrlProtocol);
   };
 
   it("should handle other scenarios for template cache", function () {
