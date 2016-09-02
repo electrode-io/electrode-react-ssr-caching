@@ -16,21 +16,10 @@ describe("SSRProfiler simple caching", function () {
     SSRProfiler.clearProfileData();
   });
 
-  function removeReactId(html) {
-    const x = html.replace(/data-reactid\=\"[^\"]+\"/g, "");
-    return x.replace(/data-react-checksum\=\"[^\"]+\"/g, "").replace(/ *>/g, ">");
-  }
-
   const verifyRenderResults = (r1, r2, r3) => {
-    chai.assert(r1 !== r2, "render1 and render2 should be different");
-    chai.assert(r1 !== r3, "render1 and render3 should be different");
-    chai.assert(r2 !== r3, "render2 and render3 should be different");
-    r1 = removeReactId(r1);
-    r2 = removeReactId(r2);
-    r3 = removeReactId(r3);
-    chai.assert(r1 === r2, "render1 and render2 should be the same");
-    chai.assert(r1 === r3, "render1 and render3 should be the same");
-    chai.assert(r2 === r3, "render2 and render3 should be the same");
+    expect(r1).to.equal(r2);
+    expect(r1).to.equal(r3);
+    expect(r2).to.equal(r3);
   };
 
   //
