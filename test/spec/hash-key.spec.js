@@ -17,7 +17,7 @@ describe("setHashKey", function () {
     SSRProfiler.setHashKey(true, () => 0);
     expect(typeof SSRProfiler.hashKeyFn).to.equal("function");
     SSRProfiler.setHashKey(false);
-    expect(SSRProfiler.hashKeyFn).to.equal(undefined);
+    expect(SSRProfiler.hashKeyFn("12345")).to.equal("12345");
   });
 
   it("should use FarmHash", function () {
@@ -31,7 +31,7 @@ describe("setHashKey", function () {
       throw new Error("not found");
     };
     SSRProfiler.setHashKey(true);
-    expect(SSRProfiler.hashKeyFn).to.equal(undefined);
+    expect(SSRProfiler.hashKeyFn("12345")).to.equal("12345");
     expect(SSRProfiler.config.hashKey).to.equal(false);
     Module.prototype.require = req;
   });
