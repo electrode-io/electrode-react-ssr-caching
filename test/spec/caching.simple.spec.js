@@ -2,18 +2,18 @@
 
 // test simple caching feature
 
-const SSRProfiler = require("../..");
+const SSRCaching = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
 const chai = require("chai");
 const expect = chai.expect;
 process.env.NODE_ENV = "production";
 
-describe("SSRProfiler simple caching", function () {
+describe("SSRCaching simple caching", function () {
 
   afterEach(() => {
-    SSRProfiler.setCachingConfig({});
-    SSRProfiler.clearCache();
-    SSRProfiler.clearProfileData();
+    SSRCaching.setCachingConfig({});
+    SSRCaching.clearCache();
+    SSRCaching.clearProfileData();
   });
 
   const verifyRenderResults = (r1, r2, r3) => {
@@ -32,8 +32,8 @@ describe("SSRProfiler simple caching", function () {
     const r1 = renderGreeting("test", message);
     const r1Time = Date.now() - start;
 
-    SSRProfiler.enableCaching();
-    SSRProfiler.setCachingConfig({
+    SSRCaching.enableCaching();
+    SSRCaching.setCachingConfig({
       components: {
         "Hello": {
           strategy: "simple",
@@ -45,17 +45,17 @@ describe("SSRProfiler simple caching", function () {
 
     // should add an entry to cache with key-simple
 
-    SSRProfiler.shouldHashKeys(false);
+    SSRCaching.shouldHashKeys(false);
     renderGreeting("test", message);
-    expect(SSRProfiler.cacheStore.getEntry("Hello", "key-simple").hits).to.equal(1);
+    expect(SSRCaching.cacheStore.getEntry("Hello", "key-simple").hits).to.equal(1);
 
     // should add an entry to cache with hashed key from key-simple
 
-    SSRProfiler.shouldHashKeys(true);
+    SSRCaching.shouldHashKeys(true);
     start = Date.now();
     const r2 = renderGreeting("test", message);
     const r2Time = Date.now() - start;
-    const entry = SSRProfiler.cacheStore.getEntry("Hello", "1357465574333202611");
+    const entry = SSRCaching.cacheStore.getEntry("Hello", "1357465574333202611");
     expect(entry.hits).to.equal(1);
 
     // now render should use result from cache
@@ -78,17 +78,17 @@ describe("SSRProfiler simple caching", function () {
   it("should cache component with simple strategy and stringify", function () {
     const message = "good morning";
 
-    SSRProfiler.enableProfiling(true);
+    SSRCaching.enableProfiling(true);
     const r1 = renderGreeting("test", message);
-    const data = SSRProfiler.profileData;
+    const data = SSRCaching.profileData;
     expect(data.Greeting[0].Hello[0].time).to.be.above(0);
 
-    SSRProfiler.enableProfiling(false);
-    SSRProfiler.clearProfileData();
+    SSRCaching.enableProfiling(false);
+    SSRCaching.clearProfileData();
     expect(data).to.deep.equal({});
 
-    SSRProfiler.enableCaching();
-    SSRProfiler.setCachingConfig({
+    SSRCaching.enableCaching();
+    SSRCaching.setCachingConfig({
       components: {
         "Hello": {
           strategy: "simple",
@@ -99,20 +99,20 @@ describe("SSRProfiler simple caching", function () {
 
     // should add an entry to cache with stringified props as cache key
 
-    SSRProfiler.shouldHashKeys(false);
+    SSRCaching.shouldHashKeys(false);
     renderGreeting("test", message);
-    expect(SSRProfiler.cacheStore.getEntry("Hello", JSON.stringify({name: "test", message})).hits).to.equal(1);
+    expect(SSRCaching.cacheStore.getEntry("Hello", JSON.stringify({name: "test", message})).hits).to.equal(1);
 
     // should add an entry to cache with hashed value of key
 
-    SSRProfiler.shouldHashKeys(true);
+    SSRCaching.shouldHashKeys(true);
     const r2 = renderGreeting("test", message);
-    const entry = SSRProfiler.cacheStore.getEntry("Hello", "2422985312975527455");
+    const entry = SSRCaching.cacheStore.getEntry("Hello", "2422985312975527455");
     expect(entry.hits).to.equal(1);
 
     // now render should use result from cache
 
-    SSRProfiler.enableProfiling(true);
+    SSRCaching.enableProfiling(true);
     const r3 = renderGreeting("test", message);
     expect(data.Greeting[0].Hello[0].time).to.be.above(0);
     expect(entry.hits).to.equal(2);

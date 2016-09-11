@@ -2,34 +2,34 @@
 
 // test profiling feature
 
-const SSRProfiler = require("../..");
+const SSRCaching = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
 
-describe("SSRProfiler", function () {
+describe("SSRCaching", function () {
   beforeEach(() => {
-    SSRProfiler.enableCaching(false);
-    SSRProfiler.enableProfiling(false);
-    SSRProfiler.clearProfileData();
+    SSRCaching.enableCaching(false);
+    SSRCaching.enableProfiling(false);
+    SSRCaching.clearProfileData();
   });
 
   it("should not do anyting if profiling and caching disabled", function () {
     renderGreeting("test");
-    expect(SSRProfiler.profileData).to.deep.equal({});
+    expect(SSRCaching.profileData).to.deep.equal({});
   });
 
   it("should not generate profiling data when it's disabled", function () {
-    SSRProfiler.enableCaching();
-    SSRProfiler.enableProfiling(false);
+    SSRCaching.enableCaching();
+    SSRCaching.enableProfiling(false);
     renderGreeting("test");
-    expect(SSRProfiler.profileData).to.deep.equal({});
+    expect(SSRCaching.profileData).to.deep.equal({});
   });
 
   it("should generate profiling data for SSR component", function () {
-    SSRProfiler.enableProfiling(true);
+    SSRCaching.enableProfiling(true);
     renderGreeting("test");
-    expect(SSRProfiler.profileData.Greeting[0].time).to.be.above(0);
-    expect(SSRProfiler.profileData.Greeting[0].Hello[0].time).to.be.above(0);
-    SSRProfiler.clearProfileData();
-    expect(SSRProfiler.profileData).to.deep.equal({});
+    expect(SSRCaching.profileData.Greeting[0].time).to.be.above(0);
+    expect(SSRCaching.profileData.Greeting[0].Hello[0].time).to.be.above(0);
+    SSRCaching.clearProfileData();
+    expect(SSRCaching.profileData).to.deep.equal({});
   });
 });

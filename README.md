@@ -1,11 +1,11 @@
-# electrode-react-ssr-profiler
+# electrode-react-ssr-caching
 
-Support React Server Side Rendering profiling to inspect the time each component took to render and provide component caching to help you speed up SSR.
+Support profiling React Server Side Rendering time and component caching to help you speed up SSR.
 
 # Installing
 
 ```
-npm i electrode-react-ssr-profiler
+npm i electrode-react-ssr-caching
 ```
 
 # Usage
@@ -15,7 +15,7 @@ npm i electrode-react-ssr-profiler
 You can use this module to inspect the time each component took to render.
 
 ```js
-import SSRProfiler from "electrode-react-ssr-profiler";
+import SSRCaching from "electrode-react-ssr-caching";
 import { renderToString } from "react-dom/server";
 import MyComponent from "mycomponent";
 
@@ -24,11 +24,11 @@ for( let i = 0; i < 10; i ++ ) {
     renderToString(<MyComponent />);
 }
 
-SSRProfiler.clearProfileData();
-SSRProfiler.enableProfiling();
+SSRCaching.clearProfileData();
+SSRCaching.enableProfiling();
 const html = renderToString(<MyComponent />);
-SSRProfiler.enableProfiling(false);
-console.log(JSON.stringify(SSRProfiler.profileData, null, 2));
+SSRCaching.enableProfiling(false);
+console.log(JSON.stringify(SSRCaching.profileData, null, 2));
 ```
 
 ## Caching
@@ -38,10 +38,10 @@ Once you determined the most expensive components with profiling, you can enable
 The basic steps to enabling caching are:
 
 ```js
-import SSRProfiler from "electrode-react-ssr-profiler";
+import SSRCaching from "electrode-react-ssr-caching";
 
-SSRProfiler.enableCaching();
-SSRProfiler.setCachingConfig(cacheConfig);
+SSRCaching.enableCaching();
+SSRCaching.setCachingConfig(cacheConfig);
 ```
 
 Where `cacheConfig` contains information on what component to apply caching.  See below for details.
@@ -72,7 +72,7 @@ const cacheConfig = {
     }
 }
 
-SSRProfiler.setCachingConfig(cacheConfig);
+SSRCaching.setCachingConfig(cacheConfig);
 ```
 
 ### Caching Strategies

@@ -2,7 +2,7 @@
 
 // test template caching feature
 
-const SSRProfiler = require("../..");
+const SSRCaching = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
 const renderBoard = require("../gen-lib/render-board").default;
 const renderHello = require("../gen-lib/render-hello").default;
@@ -10,14 +10,14 @@ const chai = require("chai");
 const expect = chai.expect;
 process.env.NODE_ENV = "production";
 
-describe("SSRProfiler template caching", function () {
+describe("SSRCaching template caching", function () {
 
   beforeEach(() => {
-    SSRProfiler.setCachingConfig({});
-    SSRProfiler.clearCache();
-    SSRProfiler.clearProfileData();
-    SSRProfiler.enableCaching(false);
-    SSRProfiler.enableProfiling(false);
+    SSRCaching.setCachingConfig({});
+    SSRCaching.clearCache();
+    SSRCaching.clearProfileData();
+    SSRCaching.enableCaching(false);
+    SSRCaching.enableProfiling(false);
   });
 
   function removeReactChecksum(html) {
@@ -49,8 +49,8 @@ describe("SSRProfiler template caching", function () {
 
     // Enable caching and test
 
-    SSRProfiler.enableCaching();
-    SSRProfiler.setCachingConfig({
+    SSRCaching.enableCaching();
+    SSRCaching.setCachingConfig({
       components: {
         "Hello": {
           strategy: "template",
@@ -61,15 +61,15 @@ describe("SSRProfiler template caching", function () {
 
     // should add an entry to cache with template key
 
-    SSRProfiler.stripUrlProtocol(true);
-    SSRProfiler.shouldHashKeys(false);
+    SSRCaching.stripUrlProtocol(true);
+    SSRCaching.shouldHashKeys(false);
 
     // first just render Hello by itself to create a cache with diff react-id's
 
     renderHello("test", message); // eslint-disable-line
-    const key1 = Object.keys(SSRProfiler.cacheStore.cache)[0];
+    const key1 = Object.keys(SSRCaching.cacheStore.cache)[0];
     const keyTmpl = key1.substr(6);
-    const entry1 = SSRProfiler.cacheStore.getEntry("Hello", keyTmpl);
+    const entry1 = SSRCaching.cacheStore.getEntry("Hello", keyTmpl);
     expect(entry1.hits).to.equal(1);
 
     // render hello again and verify cache
@@ -86,10 +86,10 @@ describe("SSRProfiler template caching", function () {
 
     // should add an entry to cache with hashed key from template key
 
-    SSRProfiler.shouldHashKeys(true);
-    const hashKey = SSRProfiler.hashKeyFn(keyTmpl);
+    SSRCaching.shouldHashKeys(true);
+    const hashKey = SSRCaching.hashKeyFn(keyTmpl);
     const r2 = renderGreeting("test", message);
-    const entry = SSRProfiler.cacheStore.getEntry("Hello", hashKey);
+    const entry = SSRCaching.cacheStore.getEntry("Hello", hashKey);
     expect(entry.hits).to.equal(1);
 
     // now render should use result from cache
@@ -98,9 +98,9 @@ describe("SSRProfiler template caching", function () {
     expect(entry.hits).to.equal(2);
     expect(r2).includes(message);
     verifyRenderResults(r1, r2, r3);
-    SSRProfiler.cacheHitReport();
-    expect(SSRProfiler.cacheEntries()).to.equal(2);
-    expect(SSRProfiler.cacheSize()).to.be.above(0);
+    SSRCaching.cacheHitReport();
+    expect(SSRCaching.cacheEntries()).to.equal(2);
+    expect(SSRCaching.cacheSize()).to.be.above(0);
   });
 
   const users = [
@@ -196,44 +196,44 @@ describe("SSRProfiler template caching", function () {
   };
 
   const testTemplate = (stripUrlProtocol, hashKeys, profiling) => {
-    SSRProfiler.enableProfiling(profiling);
+    SSRCaching.enableProfiling(profiling);
 
     let start = Date.now();
     const r1 = renderBoard(users);
     const r1Time = Date.now() - start;
 
     if (profiling) {
-      const data = SSRProfiler.profileData;
+      const data = SSRCaching.profileData;
       expect(data.Board[0].InfoCard[0].time).to.be.above(0);
-      SSRProfiler.clearProfileData();
-      SSRProfiler.enableProfiling(false);
+      SSRCaching.clearProfileData();
+      SSRCaching.enableProfiling(false);
     }
 
-    SSRProfiler.enableCaching();
-    SSRProfiler.setCachingConfig(cacheConfig);
-    SSRProfiler.shouldHashKeys(hashKeys);
-    SSRProfiler.stripUrlProtocol(stripUrlProtocol);
+    SSRCaching.enableCaching();
+    SSRCaching.setCachingConfig(cacheConfig);
+    SSRCaching.shouldHashKeys(hashKeys);
+    SSRCaching.stripUrlProtocol(stripUrlProtocol);
 
     start = Date.now();
     let r2 = renderBoard(users);
     const r2Time = Date.now() - start;
 
-    const cache = SSRProfiler.cacheStore.cache;
+    const cache = SSRCaching.cacheStore.cache;
     const keys = Object.keys(cache);
     keys.forEach((x) => {
       expect(cache[x].hits).to.equal(0);
     });
 
-    SSRProfiler.enableProfiling(profiling);
+    SSRCaching.enableProfiling(profiling);
 
     start = Date.now();
     let r3 = renderBoard(users);
     const r3Time = Date.now() - start;
 
     if (profiling) {
-      const data = SSRProfiler.profileData;
+      const data = SSRCaching.profileData;
       expect(data.Board[0].InfoCard[0].time).to.be.above(0);
-      SSRProfiler.clearProfileData();
+      SSRCaching.clearProfileData();
     }
 
     console.log(`rendering time r1 ${r1Time}ms r2 ${r2Time}ms r3 (cached) ${r3Time}ms`);
@@ -267,15 +267,15 @@ describe("SSRProfiler template caching", function () {
 
   it("should support debug caching", function () {
     renderBoard(users);
-    SSRProfiler.enableCaching();
-    SSRProfiler.enableCachingDebug();
-    expect(SSRProfiler.config.debug).to.equal(true);
-    SSRProfiler.enableCachingDebug(false);
-    expect(SSRProfiler.config.debug).to.equal(false);
-    SSRProfiler.enableCachingDebug(true);
-    expect(SSRProfiler.config.debug).to.equal(true);
-    SSRProfiler.setCachingConfig(cacheConfig);
-    SSRProfiler.shouldHashKeys(false);
+    SSRCaching.enableCaching();
+    SSRCaching.enableCachingDebug();
+    expect(SSRCaching.config.debug).to.equal(true);
+    SSRCaching.enableCachingDebug(false);
+    expect(SSRCaching.config.debug).to.equal(false);
+    SSRCaching.enableCachingDebug(true);
+    expect(SSRCaching.config.debug).to.equal(true);
+    SSRCaching.setCachingConfig(cacheConfig);
+    SSRCaching.shouldHashKeys(false);
     const r2 = renderBoard(users);
     expect(r2).includes("<!-- component Board cacheType NONE");
     expect(r2).includes("<!-- component InfoCard cacheType cache");
@@ -287,8 +287,8 @@ describe("SSRProfiler template caching", function () {
   it("should throw error for unknown caching strategy", function () {
     const config = JSON.parse(JSON.stringify(cacheConfig));
     config.components.Heading.strategy = "unknown";
-    SSRProfiler.enableCaching();
-    SSRProfiler.setCachingConfig(config);
+    SSRCaching.enableCaching();
+    SSRCaching.setCachingConfig(config);
     expect(() => renderBoard(users)).to.throw(Error, /Unknown caching strategy unknown for component Heading/);
   });
 });

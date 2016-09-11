@@ -1,8 +1,8 @@
 {
-  "name": "electrode-react-ssr-profiler",
+  "name": "electrode-react-ssr-caching",
   "version": "0.1.3",
   "description": "Optimize React SSR with profiling and component caching",
-  "main": "lib/ssr-profiler.js",
+  "main": "lib/ssr-caching.js",
   "scripts": {
     "test": "npm run build-test && gulp check",
     "build-test": "rm -f test/gen-lib/* && babel test/src -d test/gen-lib",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:electrode-io/electrode-react-ssr-profiler.git"
+    "url": "git@github.com:electrode-io/electrode-react-ssr-caching.git"
   },
   "keywords": [],
   "author": "Joel Chen <xchen@walmartlabs.com>",

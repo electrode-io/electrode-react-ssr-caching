@@ -51,7 +51,7 @@ After you've written profiling code to manually render your component with stati
 
 The first thing you want to do now is run profiling for a single rendering pass to find how long each individual component take.
 
-Here is an example to use electrode-react-ssr-profiler to profile a component using Redux:
+Here is an example to use electrode-react-ssr-caching to profile a component using Redux:
 
 ```js
 const data = {
@@ -73,11 +73,11 @@ for( let i = 0; i < 10; i ++ ) {
 // Now profile and save the data for a single rendering pass
 
 promise.then( () => {
-    SSRProfiler.enableProfiling();
-    SSRProfiler.clearProfileData();
+    SSRCaching.enableProfiling();
+    SSRCaching.clearProfileData();
     return renderComponent()
         .then( () => {
-            console.log( SSRProfiler.data, null, 2 );
+            console.log( SSRCaching.data, null, 2 );
         });
 });
 ```
