@@ -10,6 +10,17 @@ npm i electrode-react-ssr-caching
 
 # Usage
 
+Note that since this module patches React's source code to inject the caching logic, it must be loaded before the React module.
+
+For example:
+
+```js
+import SSRCaching from "electrode-react-ssr-caching";
+import React from 'react';
+import ReactDOM from 'react-dom/server';
+```
+
+
 ## Profiling
 
 You can use this module to inspect the time each component took to render.
