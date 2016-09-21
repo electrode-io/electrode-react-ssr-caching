@@ -1,0 +1,15 @@
+language: node_js
+
+node_js:
+  - v6
+
+brances:
+  only:
+    - master
+
+before_install:
+  - currentfolder=${PWD##*/}
+  - if [ "$currentfolder" != 'electrode-react-ssr-caching' ]; then cd .. && eval "mv $currentfolder electrode-react-ssr-caching" && cd electrode-react-ssr-caching; fi
+
+script:
+  - npm test
