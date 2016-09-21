@@ -12,4 +12,4 @@ before_install:
   - if [ "$currentfolder" != 'electrode-react-ssr-caching' ]; then cd .. && eval "mv $currentfolder electrode-react-ssr-caching" && cd electrode-react-ssr-caching; fi
 
 script:
-  - gulp check
+  - npm test
