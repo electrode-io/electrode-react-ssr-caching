@@ -13,6 +13,8 @@ process.env.NODE_ENV = "production";
 
 describe("SSRCaching template caching", function () {
 
+  this.timeout(10000);
+
   beforeEach(() => {
     SSRCaching.setCachingConfig({});
     SSRCaching.clearCache();
