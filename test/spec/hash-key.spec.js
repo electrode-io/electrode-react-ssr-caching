@@ -2,6 +2,7 @@
 
 // test hash key feature
 
+require("../farmhash-mock");
 const SSRCaching = require("../..");
 const Module = require("module");
 
@@ -22,7 +23,7 @@ describe("shouldHashKeys", function () {
 
   it("should use FarmHash", function () {
     SSRCaching.shouldHashKeys(true);
-    expect(SSRCaching.hashKeyFn("hello, world")).to.equal("12299089882482858311");
+    expect(SSRCaching.hashKeyFn("hello, world")).to.equal("9fd13d4e606f0f57fd2f481e875a39af");
   });
 
   it("should disable if farmhash missing", function () {

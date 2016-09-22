@@ -2,6 +2,7 @@
 
 // test template caching feature
 
+require("../farmhash-mock");
 const SSRCaching = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
 const renderBoard = require("../gen-lib/render-board").default;
