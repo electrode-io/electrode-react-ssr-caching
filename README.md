@@ -1,4 +1,4 @@
-# electrode-react-ssr-caching
+# electrode-react-ssr-caching [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 
 Support profiling React Server Side Rendering time and component caching to help you speed up SSR.
 
@@ -243,3 +243,9 @@ Print out cache entries and number of hits each one has.
 
 [Sasha Aickin's talk]: https://www.youtube.com/watch?v=PnpfGy7q96U
 [farmhash]: https://github.com/google/farmhash
+[npm-image]: https://badge.fury.io/js/electrode-react-ssr-caching.svg
+[npm-url]: https://npmjs.org/package/electrode-react-ssr-caching
+[travis-image]: https://travis-ci.org/electrode-io/electrode-react-ssr-caching.svg?branch=master
+[travis-url]: https://travis-ci.org/electrode-io/electrode-react-ssr-caching
+[daviddm-image]: https://david-dm.org/electrode-io/electrode-react-ssr-caching.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/electrode-io/electrode-react-ssr-caching
