@@ -112,7 +112,7 @@ This strategy is not very flexible.  You need a cache entry for each different p
 
 The `template` caching strategy is more complex but flexible.  
 
-The idea is akin to generating logic-less handlebars template from your React components and then use string replace to process the template with different props. 
+The idea is akin to generating logic-less handlebars template from your React components and then use string replace to process the template with different props.
 
 If you have this component:
 
@@ -210,7 +210,7 @@ Remove `http:` or `https:` from prop values that are URLs according to flag.
 
    - `undefined` or `true` - strip URL protocol
    - `false` - don't strip
- 
+
 ### [`shouldHashKeys(flag, [hashFn])`](#shouldhashkeysflaghashfn)
 
 Set whether the `template` strategy should hash the cache key and use that instead.
@@ -240,6 +240,8 @@ Get total number of cache entries
 ### [`cacheHitReport()`](#cachehitreport)
 
 Print out cache entries and number of hits each one has.
+
+Built with :heart: by [Team Electrode](https://github.com/orgs/electrode-io/people) @WalmartLabs.
 
 [Sasha Aickin's talk]: https://www.youtube.com/watch?v=PnpfGy7q96U
 [farmhash]: https://github.com/google/farmhash
