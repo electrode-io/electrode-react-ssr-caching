@@ -57,6 +57,8 @@ SSRCaching.setCachingConfig(cacheConfig);
 
 Where `cacheConfig` contains information on what component to apply caching.  See below for details.
 
+In order for the `enableCaching()` method to work, you'll also need `NODE_ENV` set to `production`, or else it will throw an error.
+
 ### cacheConfig
 
 SSR component caching was first demonstrated in [Sasha Aickin's talk].
