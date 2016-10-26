@@ -241,7 +241,7 @@ Get total number of cache entries
 
 ### [`cacheHitReport()`](#cachehitreport)
 
-Print out cache entries and number of hits each one has.
+Returns an object with information about cache entry hits
 
 Built with :heart: by [Team Electrode](https://github.com/orgs/electrode-io/people) @WalmartLabs.
 
