@@ -7,7 +7,6 @@ const CacheStore = require("../../lib/cache-store");
 describe("CacheStore", function () {
   it("should cache entry", function () {
     const cacheStore = new CacheStore({
-      cacheExpireTime: 200,
       MAX_CACHE_SIZE: 1024,
       minFreeCacheSize: 200,
       maxFreeCacheSize: 400
@@ -21,7 +20,6 @@ describe("CacheStore", function () {
 
   it("should free up cache", function (done) {
     const cacheStore = new CacheStore({
-      cacheExpireTime: 100,
       MAX_CACHE_SIZE: 85,
       minFreeCacheSize: 20,
       maxFreeCacheSize: 40
