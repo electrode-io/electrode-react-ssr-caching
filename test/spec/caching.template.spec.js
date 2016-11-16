@@ -2,6 +2,7 @@
 
 // test template caching feature
 
+require("../farmhash-mock");
 const SSRCaching = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
 const renderBoard = require("../gen-lib/render-board").default;
@@ -11,6 +12,8 @@ const expect = chai.expect;
 process.env.NODE_ENV = "production";
 
 describe("SSRCaching template caching", function () {
+
+  this.timeout(10000);
 
   beforeEach(() => {
     SSRCaching.setCachingConfig({});
@@ -98,7 +101,12 @@ describe("SSRCaching template caching", function () {
     expect(entry.hits).to.equal(2);
     expect(r2).includes(message);
     verifyRenderResults(r1, r2, r3);
-    SSRCaching.cacheHitReport();
+
+    const hitReport = SSRCaching.cacheHitReport();
+    Object.keys(hitReport).forEach((key) => {
+      console.log(`Cache Entry ${key} Hits ${hitReport[key].hits}`); // eslint-disable-line
+    });
+
     expect(SSRCaching.cacheEntries()).to.equal(2);
     expect(SSRCaching.cacheSize()).to.be.above(0);
   });

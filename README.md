@@ -1,4 +1,4 @@
-# electrode-react-ssr-caching
+# electrode-react-ssr-caching [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 
 Support profiling React Server Side Rendering time and component caching to help you speed up SSR.
 
@@ -57,6 +57,8 @@ SSRCaching.setCachingConfig(cacheConfig);
 
 Where `cacheConfig` contains information on what component to apply caching.  See below for details.
 
+In order for the `enableCaching()` method to work, you'll also need `NODE_ENV` set to `production`, or else it will throw an error.
+
 ### cacheConfig
 
 SSR component caching was first demonstrated in [Sasha Aickin's talk].
@@ -112,7 +114,7 @@ This strategy is not very flexible.  You need a cache entry for each different p
 
 The `template` caching strategy is more complex but flexible.  
 
-The idea is akin to generating logic-less handlebars template from your React components and then use string replace to process the template with different props. 
+The idea is akin to generating logic-less handlebars template from your React components and then use string replace to process the template with different props.
 
 If you have this component:
 
@@ -210,7 +212,7 @@ Remove `http:` or `https:` from prop values that are URLs according to flag.
 
    - `undefined` or `true` - strip URL protocol
    - `false` - don't strip
- 
+
 ### [`shouldHashKeys(flag, [hashFn])`](#shouldhashkeysflaghashfn)
 
 Set whether the `template` strategy should hash the cache key and use that instead.
@@ -239,7 +241,15 @@ Get total number of cache entries
 
 ### [`cacheHitReport()`](#cachehitreport)
 
-Print out cache entries and number of hits each one has.
+Returns an object with information about cache entry hits
+
+Built with :heart: by [Team Electrode](https://github.com/orgs/electrode-io/people) @WalmartLabs.
 
 [Sasha Aickin's talk]: https://www.youtube.com/watch?v=PnpfGy7q96U
 [farmhash]: https://github.com/google/farmhash
+[npm-image]: https://badge.fury.io/js/electrode-react-ssr-caching.svg
+[npm-url]: https://npmjs.org/package/electrode-react-ssr-caching
+[travis-image]: https://travis-ci.org/electrode-io/electrode-react-ssr-caching.svg?branch=master
+[travis-url]: https://travis-ci.org/electrode-io/electrode-react-ssr-caching
+[daviddm-image]: https://david-dm.org/electrode-io/electrode-react-ssr-caching.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/electrode-io/electrode-react-ssr-caching

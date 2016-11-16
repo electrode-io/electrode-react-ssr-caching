@@ -2,6 +2,7 @@
 
 // test simple caching feature
 
+require("../farmhash-mock");
 const SSRCaching = require("../..");
 const renderGreeting = require("../gen-lib/render-greeting").default;
 const chai = require("chai");
@@ -9,7 +10,6 @@ const expect = chai.expect;
 process.env.NODE_ENV = "production";
 
 describe("SSRCaching simple caching", function () {
-
   afterEach(() => {
     SSRCaching.setCachingConfig({});
     SSRCaching.clearCache();
@@ -55,7 +55,7 @@ describe("SSRCaching simple caching", function () {
     start = Date.now();
     const r2 = renderGreeting("test", message);
     const r2Time = Date.now() - start;
-    const entry = SSRCaching.cacheStore.getEntry("Hello", "1357465574333202611");
+    const entry = SSRCaching.cacheStore.getEntry("Hello", "500034349202595839ffe2cb6f83665b");
     expect(entry.hits).to.equal(1);
 
     // now render should use result from cache
@@ -107,7 +107,7 @@ describe("SSRCaching simple caching", function () {
 
     SSRCaching.shouldHashKeys(true);
     const r2 = renderGreeting("test", message);
-    const entry = SSRCaching.cacheStore.getEntry("Hello", "2422985312975527455");
+    const entry = SSRCaching.cacheStore.getEntry("Hello", "6a86523415a68c4c7580fe6db324923c");
     expect(entry.hits).to.equal(1);
 
     // now render should use result from cache
