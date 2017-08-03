@@ -1,6 +1,6 @@
 {
   "name": "electrode-react-ssr-caching",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Optimize React SSR with profiling and component caching",
   "main": "lib/ssr-caching.js",
   "scripts": {
