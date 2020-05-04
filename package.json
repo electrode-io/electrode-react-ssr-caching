@@ -6,7 +6,9 @@
   "scripts": {
     "test": "npm run build-test && gulp check",
     "build-test": "rm -f test/gen-lib/* && babel test/src -d test/gen-lib",
-    "coverage": "npm run build-test && gulp test-cov"
+    "coverage": "npm run build-test && gulp test-cov",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -37,6 +39,8 @@
     "redux": "^3.5.2"
   },
   "dependencies": {
-    "lodash": "^4.13.1"
-  }
+    "lodash": "^4.13.1",
+    "snyk": "^1.317.0"
+  },
+  "snyk": true
 }
